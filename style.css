@@ -93,8 +93,10 @@ input:focus {
 
 #height-objects {
   position: relative;
-  width: 100%;
+  width: 90%;
   height: 100%;
+  margin: auto;
+  overflow-x: scroll;
   display: flex;
   z-index: 3;
   align-items: flex-end;
@@ -228,6 +230,11 @@ input:focus {
     box-sizing: border-box;
   }
 
+  html, body {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+
   h1 {
     font-size: 1rem;
   }
@@ -235,7 +242,8 @@ input:focus {
   #main-area {
     display: flex;
     flex-flow: column nowrap;
-    min-height: 95%;
+    height: 95%;
+    overflow-y: scroll;
     padding-bottom: 4%;
     gap: 1%;
   }

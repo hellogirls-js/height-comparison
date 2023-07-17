@@ -44,11 +44,10 @@ function drawUserHeight() {
 
   const height = $("#text-height").val();
   const clone = $($("#height-obj-template").html());
-  const obj = $("<object>");
-  obj.attr("data", "Human_outline_generic.svg");
-  obj.height(height * (CONTAINER_HEIGHT/FULL_HEIGHT));
-  obj.attr("type", "image/svg+xml");
-  obj.css("fill", `${RAINBOW[personObjectCount]}aa`);
+  const obj = $("<img />");
+  obj.addClass("height-img-obj");
+  obj.attr("src", "Human_outline_generic.svg");
+  obj.attr("height", height * (CONTAINER_HEIGHT/FULL_HEIGHT));
   $(".height-img", clone).append(obj);
   $(".height-name", clone).text($("#text-name").val() || `person ${nameIndex}`)
   $(".height-number", clone).text(`${height} cm`);
@@ -164,6 +163,7 @@ function drawCharaHeight(charaName, id, height) {
 
   const clone = $($("#height-obj-template").html());
   const img = $("<img />");
+  img.addClass("height-img-obj");
   img.attr("src", `https://res.cloudinary.com/df2zvtnjc/image/upload/v1689533273/transparent-renders/character_full1_${id}.png`);
   img.attr("height", adjustedHeight * (CONTAINER_HEIGHT/FULL_HEIGHT));
 
@@ -207,12 +207,39 @@ function createDropdownList(tlData, rawData) {
   }
 }
 
+function updateVh() {
+  let vh = window.innerHeight * 0.01;
+  $(document.documentElement).css("--vh", `${vh}px`);
+
+  const HEIGHT_INCREMENT = 10;
+  const FULL_HEIGHT = 220;
+  const CONTAINER_HEIGHT = $("#height-canvas").innerHeight();
+
+  $("#scale-container").empty();
+  for (let i = 0; i < FULL_HEIGHT; i += HEIGHT_INCREMENT) {
+    let clone = $($("#scale-template").html());
+    $(".scale-label-left", clone).text(`${i} cm`);
+    $(".scale-label-right", clone).text(`${i} cm`);
+    $(clone).height(CONTAINER_HEIGHT / (FULL_HEIGHT / HEIGHT_INCREMENT));
+    $("#scale-container").prepend(clone);
+  }
+
+  if ($(".height-obj").length) {
+    $(".height-obj").each(function() {
+      $(this).find(".height-img-obj").attr("height", parseInt($(this).find(".height-number").text().split(' ')[0]) * (CONTAINER_HEIGHT/FULL_HEIGHT))
+    })
+  }
+}
+
 $(document).ready(async function() {
+  updateVh();
   drawHeightChart();
   const tlData = await getData(TL_DATA_URL);
   const rawData = await getData(DATA_URL);
 
   createDropdownList(tlData, rawData);
+
+  $(window).resize(_.debounce(updateVh, 100));
 
   $("#height-objects").sortable({
     axis: "x"
@@ -225,9 +252,22 @@ $(document).ready(async function() {
     }
   });
 
+  $("#character-filter").on("input", function(e) { 
+    if ($("#character-dropdown-list").css("display") !== "none") {
+      $("#character-dropdown-list").empty();
+      if (e.target.value.length === 0) {
+        createDropdownList(tlData, rawData)
+      } else {
+        let filteredTlData = tlData.filter(d => d.first_name.toLowerCase().includes(e.target.value.toLowerCase()));
+        let filteredRawData = rawData.filter(d => filteredTlData.some(tl => tl.character_id === d.character_id));
+        createDropdownList(filteredTlData, filteredRawData);
+      }
+    }
+   });
+
   $("#character-filter").click(function(e) {
     e.preventDefault();
-    $("#character-dropdown-list").slideToggle("fast");
+    $("#character-dropdown-list").slideDown("fast");
   })
 
   $("#toggle-dropdown").click(function(e) {
