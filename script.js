@@ -191,19 +191,17 @@ function drawCharaHeight(charaName, id, height) {
 
 function createDropdownList(tlData, rawData) {
   for (let i = 0; i < tlData.length; i++) {
-    if (tlData[i].charcter_id !== 32 && tlData[i].charcter_id !== 33) {
-      let thisRawData = rawData.find(d => d.character_id === tlData[i].character_id);
-      let clone = $($("#character-list-template").html());
-      $(".character-list-item-name", clone).text(tlData[i].first_name);
-      $(".character-list-item-height", clone).text(`${thisRawData.height} cm`);
-      $(clone).click(function(e) {
-        // add element to chart
-        if (heightObjectCount < 5) {
-          drawCharaHeight(tlData[i].first_name, tlData[i].character_id, thisRawData.height);
-        }
-      });
-      $("#character-dropdown-list").append(clone);
-    }
+    let thisRawData = rawData.find(d => d.character_id === tlData[i].character_id);
+    let clone = $($("#character-list-template").html());
+    $(".character-list-item-name", clone).text(tlData[i].first_name);
+    $(".character-list-item-height", clone).text(`${thisRawData.height} cm`);
+    $(clone).click(function(e) {
+      // add element to chart
+      if (heightObjectCount < 5) {
+        drawCharaHeight(tlData[i].first_name, tlData[i].character_id, thisRawData.height);
+      }
+    });
+    $("#character-dropdown-list").append(clone);
   }
 }
 
