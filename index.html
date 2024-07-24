@@ -15,7 +15,7 @@
     <div id="loading"></div>
     <div id="container">
       <header id="header">
-        <div id="header-title"><h1>ENST!! height comparison</h1></div>
+        <div id="header-title"><h1>ENST!! Height Comparison</h1></div>
         <div id="credit">made by <a href="https://about.hellogirls.info" target="_blank">son</a></div>
       </header>
       <main id="main-area">
@@ -51,7 +51,7 @@
           </div>
         </div>
         <div id="controls-container">
-          <span class="subtext">max: 5 people and characters</span>
+          <span class="subtext">Max: 5 people and characters</span>
           <div id="user-stuff">
             <div id="user-list">
               <template id="user-item-template">
@@ -66,11 +66,11 @@
               <h3>Add a person</h3>
               <div id="form-container">
                 <div class="text-field">
-                  <label for="name">name</label>
+                  <label for="name">Name</label>
                   <input type="text" name="name" id="text-name" placeholder="optional" aria-label="name" />
                 </div>
                 <div class="text-field">
-                  <label for="height">height</label>
+                  <label for="height">Height</label>
                   <input type="number" name="height" id="text-height" placeholder="in centimeters" min="0" max="220" step="0.5" aria-label="height" />
                 </div>
               </div>
@@ -83,6 +83,10 @@
                 <div class="character-item">
                   <div class="character-item-name"></div>
                   <div class="character-item-height"></div>
+                  <div class="character-item-height-switch">
+                    <input type="checkbox" class="character-item-height-switch-check" />
+                    <label class="character-item-height-switch-label">Use new height</label>
+                  </div>
                   <div class="character-item-delete"><i class="ti ti-x"></i></div>
                 </div>
               </template>
@@ -90,7 +94,7 @@
             <h3>Add a character</h3>
             <div id="character-dropdown">
               <div id="filter-box">
-                <input type="text" id="character-filter" aria-label="filter character" placeholder="filter characters..." />
+                <input type="text" id="character-filter" aria-label="filter character" placeholder="Filter characters..." />
                 <div id="toggle-dropdown"><i class="ti ti-chevron-down"></i></div>
               </div>
               <div id="character-dropdown-list">

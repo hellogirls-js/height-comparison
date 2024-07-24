@@ -123,7 +123,7 @@ input:focus {
 }
 
 #user-stuff, #character-stuff {
-  margin-top: 10%;
+  margin-top: 12%;
 }
 
 .text-field {
@@ -200,6 +200,7 @@ input:focus {
 }
 
 .character-list-item-name {
+  flex-basis: 33%;
   font-weight: 600;
 }
 
@@ -219,6 +220,7 @@ input:focus {
 
 .character-item-name, .user-item-name {
   font-weight: 600;
+  flex-basis: 33%;
 }
 
 .character-item-delete, .user-item-delete {

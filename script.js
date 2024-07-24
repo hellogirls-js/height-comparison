@@ -30,6 +30,110 @@ async function getData(url) {
   }
 }
 
+function addNewHeight(newObject, oldHeight, amt) {
+  newObject.height_new = oldHeight + amt;
+}
+
+function extractHeightData(rawData, tlData) {
+  const data = tlData.map(data => {
+    const matchingRawData = rawData.find(r => r.character_id === data.character_id);
+    const newObject = {
+      character_id: data.character_id,
+      sort_id: matchingRawData.sort_id,
+      first_name: data.first_name,
+      height: matchingRawData.height,
+    };
+    
+    switch (matchingRawData.sort_id) {
+      case 3:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 6:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 8:
+        addNewHeight(newObject, matchingRawData.height, 2);
+        break;
+      case 11:
+        addNewHeight(newObject, matchingRawData.height, 2);
+        break;
+      case 13:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 20:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 21:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 23:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 29:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 30:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 43:
+        addNewHeight(newObject, matchingRawData.height, 2);
+        break;
+      case 44:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 46:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      case 48:
+        addNewHeight(newObject, matchingRawData.height, 1);
+        break;
+      default:
+        break;
+    }
+
+    return newObject;
+  });
+
+
+
+  let sortedData = data.sort((a, b) => a.sort_id - b.sort_id);
+  
+  sortedData = [...sortedData, 
+    {
+      first_name: "Esu",
+      character_id: 81,
+      height: 160,
+    },
+    {
+      first_name: "Ibuki",
+      character_id: 82,
+      height: 165,
+    },
+    {
+      first_name: "Kanna",
+      character_id: 83,
+      height: 163,
+    },
+    {
+      first_name: "Fuyume",
+      character_id: 84,
+      height: 156
+    },
+    {
+      first_name: "Raika",
+      character_id: 85,
+      height: 158,
+    },
+    {
+      first_name: "Nice",
+      height: 180,
+      character_id: 86
+    }
+  ]
+
+  return sortedData;
+}
+
 function disableItems() {
   if (heightObjectCount >= 5) {
     $("#add-person").attr("disabled", true);
@@ -72,12 +176,13 @@ function drawUserHeight() {
   disableItems();
 }
 
-function drawCharaHeight(charaName, id, height) {
+function drawCharaHeight(heightData) {
+  const {first_name, character_id, height, height_new} = heightData;
   const FULL_HEIGHT = 220;
   const CONTAINER_HEIGHT = $("#height-canvas").innerHeight();
 
   let adjustedHeight;
-  switch (id) {
+  switch (character_id) {
     case 4:
       adjustedHeight = height + 10;
       break;
@@ -156,24 +261,48 @@ function drawCharaHeight(charaName, id, height) {
     case 71:
       adjustedHeight = height + 4;
       break;
+    case 81:
+      adjustedHeight = height + 6;
+      break;
+    case 82:
+      adjustedHeight = height + 5;
+      break;
+    case 83:
+      adjustedHeight = height + 2;
+      break;
+    case 85:
+      adjustedHeight = height + 21;
+      break;
     default:
       adjustedHeight = height;
       break;
   }
 
   const clone = $($("#height-obj-template").html());
+  const placeholderImg = new Image();
+  placeholderImg.src = `https://assets.hellogirls.info/renders/character_full1_${character_id}.png`;
+  const IMAGE_WIDTH = placeholderImg.width;
+  const IMAGE_HEIGHT = placeholderImg.height;
+  const IMAGE_RATIO = IMAGE_WIDTH / IMAGE_HEIGHT;
+  const calculatedImageHeight = adjustedHeight * (CONTAINER_HEIGHT/FULL_HEIGHT);
+  const calculatedImageWidth = calculatedImageHeight * IMAGE_RATIO;
+
   const img = $("<img />");
   img.addClass("height-img-obj");
-  img.attr("src", `https://res.cloudinary.com/df2zvtnjc/image/upload/v1689533273/transparent-renders/character_full1_${id}.png`);
-  img.attr("height", adjustedHeight * (CONTAINER_HEIGHT/FULL_HEIGHT));
+  img.attr("id", `height-img-obj-${character_id}`);
+  img.attr("src", `https://assets.hellogirls.info/renders/character_full1_${character_id}.png`);
+  img.attr("height", calculatedImageHeight);
+  img.attr("width", calculatedImageWidth);
 
   $(".height-img", clone).append(img);
-  $(".height-name", clone).text(charaName)
+  $(".height-name", clone).text(first_name)
   $(".height-number", clone).text(`${height} cm`);
+  $(".height-number", clone).attr("id", `height-number-${character_id}`);
 
   const itemClone = $($("#character-item-template").html());
-  $(".character-item-name", itemClone).text(charaName);
+  $(".character-item-name", itemClone).text(first_name);
   $(".character-item-height", itemClone).text(`${height} cm`);
+  $(".character-item-height", itemClone).attr("id", `character-item-height-${character_id}`);
   $(".character-item-delete", itemClone).click(function(e) {
     e.preventDefault();
     $(itemClone).remove();
@@ -181,6 +310,24 @@ function drawCharaHeight(charaName, id, height) {
     heightObjectCount--;
     disableItems();
   });
+  if (!height_new) {
+    $(".character-item-height-switch", itemClone).css("display", "none");
+  } else {
+    $(".character-item-height-switch-check", itemClone).change(function(e) {
+      const heightDifference = height_new - height;
+      const newCalculatedHeight = (adjustedHeight + heightDifference) * (CONTAINER_HEIGHT/FULL_HEIGHT);
+      console.log("new height", newCalculatedHeight);
+      if (e.target.checked) {
+        $(`#height-img-obj-${character_id}`).attr("height", newCalculatedHeight);
+        $(`#height-number-${character_id}`).text(`${height_new} cm`);
+        $(`#character-item-height-${character_id}`).text(`${height_new} cm`);
+      } else {
+        $(`#height-img-obj-${character_id}`).attr("height", calculatedImageHeight); 
+        $(`#height-number-${character_id}`).text(`${height} cm`);
+        $(`#character-item-height-${character_id}`).text(`${height} cm`);
+      }
+    })
+  }
 
   $("#height-objects").append(clone);
   $("#character-list").append(itemClone);
@@ -189,16 +336,16 @@ function drawCharaHeight(charaName, id, height) {
   disableItems();
 }
 
-function createDropdownList(tlData, rawData) {
-  for (let i = 0; i < tlData.length; i++) {
-    let thisRawData = rawData.find(d => d.character_id === tlData[i].character_id);
+function createDropdownList(heightData) {
+  for (let i = 0; i < heightData.length; i++) {
     let clone = $($("#character-list-template").html());
-    $(".character-list-item-name", clone).text(tlData[i].first_name);
-    $(".character-list-item-height", clone).text(`${thisRawData.height} cm`);
+    $(".character-list-item-name", clone).text(heightData[i].first_name);
+    const heightText = `${heightData[i].height} cm ${heightData[i].height_new ? `→${heightData[i].height_new} cm` : ""}`;
+    $(".character-list-item-height", clone).text(heightText);
     $(clone).click(function(e) {
       // add element to chart
       if (heightObjectCount < 5) {
-        drawCharaHeight(tlData[i].first_name, tlData[i].character_id, thisRawData.height);
+        drawCharaHeight(heightData[i]);
       }
     });
     $("#character-dropdown-list").append(clone);
@@ -235,7 +382,10 @@ $(document).ready(async function() {
   const tlData = await getData(TL_DATA_URL);
   const rawData = await getData(DATA_URL);
 
-  createDropdownList(tlData, rawData);
+  const heightData = extractHeightData(rawData, tlData);
+  console.table(heightData);
+
+  createDropdownList(heightData);
 
   $(window).resize(_.debounce(updateVh, 100));
 
@@ -254,11 +404,10 @@ $(document).ready(async function() {
     if ($("#character-dropdown-list").css("display") !== "none") {
       $("#character-dropdown-list").empty();
       if (e.target.value.length === 0) {
-        createDropdownList(tlData, rawData)
+        createDropdownList(heightData)
       } else {
-        let filteredTlData = tlData.filter(d => d.first_name.toLowerCase().includes(e.target.value.toLowerCase()));
-        let filteredRawData = rawData.filter(d => filteredTlData.some(tl => tl.character_id === d.character_id));
-        createDropdownList(filteredTlData, filteredRawData);
+        let filteredHeightData = heightData.filter(d => d.first_name.toLowerCase().includes(e.target.value.toLowerCase()));
+        createDropdownList(filteredHeightData);
       }
     }
    });
