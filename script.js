@@ -316,7 +316,6 @@ function drawCharaHeight(heightData) {
     $(".character-item-height-switch-check", itemClone).change(function(e) {
       const heightDifference = height_new - height;
       const newCalculatedHeight = (adjustedHeight + heightDifference) * (CONTAINER_HEIGHT/FULL_HEIGHT);
-      console.log("new height", newCalculatedHeight);
       if (e.target.checked) {
         $(`#height-img-obj-${character_id}`).attr("height", newCalculatedHeight);
         $(`#height-number-${character_id}`).text(`${height_new} cm`);
@@ -383,7 +382,6 @@ $(document).ready(async function() {
   const rawData = await getData(DATA_URL);
 
   const heightData = extractHeightData(rawData, tlData);
-  console.table(heightData);
 
   createDropdownList(heightData);
 
